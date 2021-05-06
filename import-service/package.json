@@ -1,7 +1,7 @@
 {
-  "name": "product-service",
+  "name": "import-service",
   "version": "1.0.0",
-  "description": "AWS Lambda Product Service realisation",
+  "description": "AWS Lambda Product Service realization",
   "main": "handler.js",
   "scripts": {
     "offline": "sls offline",
@@ -14,15 +14,14 @@
   "repository": "https://github.com/phoenix61/nodejs-aws-be",
   "license": "ISC",
   "dependencies": {
-    "pg": "^8.6.0",
+    "aws-sdk": "^2.903.0",
+    "csv-parser": "^3.0.0",
     "serverless-offline": "^6.9.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.75",
     "@types/node": "^14.14.37",
-    "@types/pg": "^7.14.11",
     "fork-ts-checker-webpack-plugin": "^6.2.1",
-    "json-schema-to-ts": "^1.6.3",
     "serverless-webpack": "^5.4.2",
     "ts-loader": "^8.1.0",
     "ts-node": "^9.1.1",
