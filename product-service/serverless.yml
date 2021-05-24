@@ -7,18 +7,54 @@ provider:
   runtime: nodejs12.x
   lambdaHashingVersion: 20201221
 
-  stage: dev
-  region: eu-west-1
-  profile: nodejs-aws
+  stage: ${env:STAGE}
+  region: ${env:REGION}
+  profile: ${env:PROFILE}
+
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action: "sqs:*"
+      Resource: ${cf:import-service-${self:provider.stage}.sqsArn}
+    - Effect: "Allow"
+      Action: "sns:*"
+      Resource:
+        Ref: SNSTopic
+
+  environment:
+    REGION: ${env:REGION}
+    BUCKET: ${env:BUCKET}
+    SQS_URL: ${cf:import-service-${self:provider.stage}.sqsUrl}
+    SNS_ARN:
+      Ref: SNSTopic
+    PG_HOST: ${env:PG_HOST}
+    PG_PORT: ${env:PG_PORT}
+    PG_DATABASE: ${env:PG_DATABASE}
+    PG_USERNAME: ${env:PG_USERNAME}
+    PG_PASSWORD: ${env:PG_PASSWORD}
 
 plugins:
   - serverless-webpack
   - serverless-offline
+  - serverless-dotenv-plugin
 
 custom:
   webpack:
     webpackConfig: 'webpack.config.js'
     includeModules: true
+
+resources:
+  Resources:
+    SNSTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: ${env:TOPIC_NAME}
+    SNSSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: ${env:EMAIL}
+        Protocol: email
+        TopicArn:
+          Ref: SNSTopic
 
 functions:
   getAllProducts:
@@ -28,6 +64,7 @@ functions:
           path: products
           method: get
           cors: true
+
   getProductById:
     handler: handler.getProductById
     events:
@@ -39,6 +76,7 @@ functions:
             parameters:
               paths:
                 productId: true
+
   addProduct:
     handler: handler.addProduct
     events:
@@ -46,5 +84,17 @@ functions:
           path: products
           method: post
           cors: true
+
+  catalogBatchProcess:
+    handler: handler.catalogBatchProcess
+    events:
+      - sqs:
+          batchSize: 5
+          arn: ${cf:import-service-${self:provider.stage}.sqsArn}
+#            Fn::GetAtt:
+#              - SQSQueue
+#              - Arn
+
+
 
 

@@ -1,7 +1,7 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
 
 import { successResponse, errorResponse } from '@libs/api-gateway';
-import * as Product from './model';
+import * as Product from '@models/product.model';
 
 export const getProductById: APIGatewayProxyHandler = async (event) => {
   console.log(`getProductById: incoming event: ${JSON.stringify(event)}`);

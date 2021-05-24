@@ -23,6 +23,7 @@
     "@types/pg": "^7.14.11",
     "fork-ts-checker-webpack-plugin": "^6.2.1",
     "json-schema-to-ts": "^1.6.3",
+    "serverless-dotenv-plugin": "^3.9.0",
     "serverless-webpack": "^5.4.2",
     "ts-loader": "^8.1.0",
     "ts-node": "^9.1.1",

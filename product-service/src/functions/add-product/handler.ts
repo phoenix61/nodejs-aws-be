@@ -1,6 +1,6 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
 
-import * as Products from './model';
+import * as Products from '@models/product.model';
 import { Product } from '@libs/interfaces/product.interface';
 import { successResponse, errorResponse } from '@libs/api-gateway';
 

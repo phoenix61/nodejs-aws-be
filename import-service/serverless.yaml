@@ -7,29 +7,55 @@ provider:
   runtime: nodejs12.x
   lambdaHashingVersion: 20201221
 
-  stage: dev
-  region: eu-west-1
-  profile: nodejs-aws
+  stage: ${env:STAGE}
+  region: ${env:REGION}
+  profile: ${env:PROFILE}
 
   iamRoleStatements:
     - Effect: "Allow"
       Action: "s3:ListBucket"
       Resource:
-        - "arn:aws:s3:::my-awesome-store-s3"
+        - "arn:aws:s3:::${env:BUCKET}"
     - Effect: "Allow"
       Action:
-        - "s3:*"
+        - s3:*
       Resource:
-        - "arn:aws:s3:::my-awesome-store-s3/*"
+        - "arn:aws:s3:::${env:BUCKET}/*"
+    - Effect: "Allow"
+      Action: "sqs:*"
+      Resource:
+        - Fn::GetAtt: [ SQSQueue, Arn ]
+
+  environment:
+    REGION: ${env:REGION}
+    BUCKET: ${env:BUCKET}
+    SQS_URL:
+      Ref: SQSQueue
 
 plugins:
   - serverless-webpack
   - serverless-offline
+  - serverless-dotenv-plugin
 
 custom:
   webpack:
     webpackConfig: 'webpack.config.js'
     includeModules: true
+
+resources:
+  Resources:
+    SQSQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${env:QUEUE_NAME}
+
+  Outputs:
+    sqsUrl:
+      Value:
+        Ref: SQSQueue
+    sqsArn:
+      Value:
+        Fn::GetAtt: [SQSQueue, Arn]
 
 functions:
   importProductsFile:
@@ -48,7 +74,7 @@ functions:
     handler: handler.importFileParser
     events:
       - s3:
-        bucket: my-awesome-store-s3
+        bucket: ${env:BUCKET}
         event: s3:ObjectCreated:*
         rules:
           - prefix: uploaded/

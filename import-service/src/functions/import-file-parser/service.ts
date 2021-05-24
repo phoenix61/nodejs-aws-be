@@ -14,7 +14,7 @@ export const parseFile = async (fileName) => {
   await new Promise<void>((resolve, reject) => {
     readStream
       .pipe(csv())
-      .on('data', (data) => console.log(data))
+      .on('data', (data) => sendProductToQueue(data))
       .on('end', () => {
         console.log(`${fileName} parsed successfully`);
         resolve();
@@ -41,6 +41,27 @@ export const moveFileToParsed = async (fileName) => {
 
   console.log(`Deleted from ${BUCKET}/${fileName}`);
 };
+
+function sendProductToQueue(product) {
+  const sqs = new AWS.SQS({ region: process.env.REGION });
+
+  console.log(`Sending product to the queue: ${JSON.stringify(product)}`)
+
+  sqs.sendMessage(
+    {
+      QueueUrl: process.env.SQS_URL,
+      MessageBody: JSON.stringify(product),
+    },
+    (error, data) => {
+      if (error) {
+        console.log(`Error on sending product to the queue: ${JSON.stringify(error)}`);
+        return;
+      }
+
+      console.log(`Product was successfully sent to the queue: ${JSON.stringify(data)}`);
+    }
+  );
+}
 
 function getS3Instance(): S3 {
   return new AWS.S3({ region: REGION });
