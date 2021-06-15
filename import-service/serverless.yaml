@@ -38,6 +38,7 @@ plugins:
   - serverless-dotenv-plugin
 
 custom:
+  authArn: ${cf:authorization-service-${self:provider.stage}.authArn}
   webpack:
     webpackConfig: 'webpack.config.js'
     includeModules: true
@@ -48,6 +49,15 @@ resources:
       Type: AWS::SQS::Queue
       Properties:
         QueueName: ${env:QUEUE_NAME}
+    GatewayResponseDefault4XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'  
 
   Outputs:
     sqsUrl:
@@ -65,6 +75,12 @@ functions:
           path: import
           method: get
           cors: true
+          authorizer:
+            name: basicAuthorizer
+            arn: ${self:custom.authArn}
+            resultTtlInSeconds: 0
+            identitySource: method.request.header.Authorization
+            type: token
           request:
             parameters:
               querystrings:
