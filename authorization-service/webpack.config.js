@@ -2,11 +2,11 @@ const path = require('path');
 const slsw = require('serverless-webpack');
 const nodeExternals = require('webpack-node-externals');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
-const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 
 module.exports = {
   context: __dirname,
-  mode: slsw.lib.webpack.isLocal ? 'development' : 'production',
+  mode: 'development',
   entry: slsw.lib.entries,
   devtool: slsw.lib.webpack.isLocal ? 'eval-cheap-module-source-map' : 'source-map',
   resolve: {
@@ -26,6 +26,7 @@ module.exports = {
   },
   optimization: {
     concatenateModules: false,
+    minimize: false
   },
   target: 'node',
   externals: [nodeExternals()],

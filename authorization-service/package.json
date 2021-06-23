@@ -4,7 +4,8 @@
   "description": "AWS Lambda Authorization Service",
   "main": "handler.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "deploy:dev": "sls deploy --stage dev",
+    "remove:dev-stack": "sls remove --stage dev --region eu-west-1"
   },
   "repository": {
     "type": "git",
@@ -13,10 +14,11 @@
   "author": "Puzakov Vitalii",
   "license": "ISC",
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.77",
     "@types/node": "^15.12.2",
     "fork-ts-checker-webpack-plugin": "^6.2.10",
-    "serverless-dotenv-plugin": "^3.9.0",
     "serverless-webpack": "^5.5.1",
+    "ts-loader": "^9.2.3",
     "tsconfig-paths-webpack-plugin": "^3.5.1",
     "typescript": "^4.3.2",
     "webpack": "^5.39.0",
